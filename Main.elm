@@ -70,10 +70,15 @@ Returns `Just String` if there was a problem. The corresponding
 -}
 validString : String -> Maybe String
 validString x =
+    -- Converts x to a list to a set, then performs a set difference with validChars.
+    -- Checks if that set is empty, if it is then all the characters are valid.
     if (Set.diff ((x |> String.toList) |> Set.fromList) validChars) |> Set.isEmpty 
     then 
       Nothing 
     
+    -- Otherwise it takes that set difference, which will contain the invalid characters,
+    -- converts the set to a list, then converts the chars to strings, and joins that
+    -- list of strings into a single string separated by commas.
     else  
        Just (
          Set.diff (x |> String.toList  |> Set.fromList ) validChars
@@ -87,6 +92,8 @@ validString x =
 -}
 validStringHelper : String -> String
 validStringHelper x = 
+    -- If validString returns an Ok string, returns that string.
+    -- otherwise return empty string.
     case validString x of
       Just value -> value
       Nothing -> ""
@@ -98,12 +105,17 @@ if necessary, otherwise returns the original string.
 -}     
 replace : String -> String
 replace x = 
+    -- Checks a string to see if it matches one of 
+    -- the words that we must translate.
     if x == "JERK" 
       then "JOIK"
     else if x == "YOU" 
       then "YOUS"
     else if x == "YOUR" || x == "YOURE" 
       then "YER"
+    -- Here I use String.right and String.left to check
+    -- and make replacements of "ING" and "TH" because 
+    -- we only translate if they are at an end anyway.
     else if String.right 3 x == "ING" 
       then String.left (String.length x - 3) x ++ "IN"
     else if String.left 2 x == "TH" 
@@ -121,10 +133,17 @@ Returns `Err String` when the input string is invalid.
 -}
 meowthify : String -> Result String String
 meowthify s = 
+      -- if validString s returns Nothing, then check words to translate them.
       if validString s == Nothing
       then 
+        -- Convert the string to a list of words, and use my replace function
+        -- using map to check every word to see if it needs to be translated,
+        -- then joins the string back together with spaces separating words.
         Ok (String.join " " (List.map replace (s |> String.words)))
-        
+      
+      -- Uses my validStringHelper to get rid of the "Just" portion of the 
+      -- string so that we can accurately check the length based on number
+      -- of invalid chars, to make output grammatically correct.
       else if (s |> validStringHelper |> String.length ) == 1 then
         Err ("String contains an illegal character: " ++ validStringHelper s)
       else
@@ -140,12 +159,13 @@ is inserted at the beginning or the end of the `String`.
 -}
 addUncertainty : Int -> String -> String
 addUncertainty i string =
-    if i < 0 then 
-      String.join " " <| List.concat [ [ "YANNO WHAT I MEAN" ], [ string ] ]
-    else if i > (List.length <|String.words <| string) then
-      String.join " " <| List.concat [ [ string ] , [ "YANNO WHAT I MEAN" ]]
-    else  
+      -- Need to split the string at the index.
       let 
+        -- Converts the string to a list of words, provides an index for each word, 
+        -- then partitions the list into two separate lists at the given index.
+        -- This provides a tuple of two lists, for a we want the first list, and 
+        -- the second for b. Unzip the lists to separate the indexes from the strings.
+        -- Then just take the second tuple, which contains the list of string values.
         a = List.partition (\x -> (Tuple.first x) < i) (List.indexedMap (,) (string |> String.words))
              |> Tuple.first
              |> List.unzip
@@ -154,7 +174,7 @@ addUncertainty i string =
              |> Tuple.second
              |> List.unzip
              |> Tuple.second
-      in
+      in -- Then combine the lists with the phrase in the center, and join them into a string.
         String.join " " <| List.concat [a, [ "YANNO WHAT I MEAN" ], b]
           
 
@@ -165,6 +185,8 @@ update msg model =
             let
                 m =  
                    {
+                    -- Capitalize the input string, and then meowthify it.
+                    -- Use case of to get the error message and string.
                     translated = case content |> String.toUpper |> meowthify of
                          Ok str -> str
                          Err errorMsg -> ""
@@ -178,7 +200,9 @@ update msg model =
 
         AddUncertainty ->
             let
-              c = Random.generate RandomIndex (Random.int 0 (String.length model.translated))
+              -- Create a command that will generate random values.
+              -- This will generate values from 0 to the number of words in the string.
+              c = Random.generate RandomIndex (Random.int 0 (model.translated |> String.words |> List.length))
                 
             in     
               ( model, c )
@@ -187,10 +211,11 @@ update msg model =
             let
                 m =  
                    {
+                    -- Use the random index to add uncertainty to the string when button is pressed.
                     translated = addUncertainty i model.translated
                     ,       
                     errorMsg = model.errorMsg
-                    }
+                   }
             in
               ( m, Cmd.none )  
 
