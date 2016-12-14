@@ -17,7 +17,6 @@ validChars =
     Set.fromList <| String.toList " ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
-
 -- MAIN
 
 
@@ -28,7 +27,6 @@ main =
         , subscriptions = subscriptions
         , update = update
         }
-
 
 
 -- INIT
@@ -49,7 +47,6 @@ init =
             }
     in
         ( m, Cmd.none )
-
 
 
 -- UPDATE
@@ -86,6 +83,7 @@ validString x =
             |> String.join ", "
         )
 
+
 {- Takes a string, runs it through validString, 
    turns the Maybe String into a String and returns it.
 -}
@@ -94,9 +92,13 @@ validStringHelper x =
     -- If validString returns an Ok string, returns that string.
     -- otherwise return empty string.
     case validString x of
-        Just value -> value
-        Nothing -> ""
-      
+        Just value -> 
+            value
+            
+        Nothing -> 
+            ""
+
+
 {-| Translate a single word `String` as necessary.
 
 Takes a string containing one word, translates it 
@@ -121,6 +123,7 @@ replace x =
         "D" ++ String.right(String.length x - 2) x
     else
         x
+
 
 {-| Attempt to translate a `String` to Meowth speak.
 
@@ -191,12 +194,18 @@ update msg model =
                     { -- Capitalize the input string, and then meowthify it.
                       -- Use case of to get the error message and string.
                       translated = case content |> String.toUpper |> meowthify of
-                          Ok str -> str
-                          Err errorMsg -> ""
+                          Ok str -> 
+                              str
+                              
+                          Err errorMsg -> 
+                              ""
                     ,       
                       errorMsg = case content |> String.toUpper |> meowthify of
-                          Ok str -> ""
-                          Err errorMsg -> errorMsg
+                          Ok str ->
+                              ""
+                              
+                          Err errorMsg ->
+                              errorMsg
                     }
             in
                 ( m, Cmd.none )  
@@ -219,6 +228,7 @@ update msg model =
                     }
             in
                 ( m, Cmd.none )  
+
 
 -- VIEW
 
@@ -249,7 +259,6 @@ view model =
                 [ Html.text model.errorMsg ]
             ]
         ]
-
 
 
 -- SUBSCRIPTIONS
