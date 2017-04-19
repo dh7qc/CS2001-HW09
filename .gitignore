@@ -1,0 +1,13 @@
+# Editor temp files
+*~
+\#*\#
+.\#*
+.*.sw?
+
+# Compiled files
+*.js
+*.html
+
+# Elm package stuff
+elm-stuff/
+elm-package.json
