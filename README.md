@@ -3,7 +3,7 @@
 This app is designed to help Team Rocket agents work on their Meowth-speak.
 
 Documentation for its behavior can be found publicly here: http://cpl.mwisely.xyz
-To verify that the code works properly, compare its behavior with the [reference implementation](http://cpl.mwisely.xyz/hw/10/demo.html).
+To verify that the code works properly, compare its behavior with the [reference implementation](https://dh7qc.github.io/CS2001-HW09/).
 
 ## Using the App
 
